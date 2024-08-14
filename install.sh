@@ -271,7 +271,7 @@ else
     echo -e "${R}->${NC} ${LC}You might get asked for SUDO password - required for Updates${NC}"
 
     # Check if the system is an SBC (e.g., Raspberry Pi, Orange Pi) or ARM-based
-    if grep -q "Raspberry" /proc/device-tree/model || grep -q "Orange" /proc/device-tree/model || grep -q "Rockchip" /proc/device-tree/model || lscpu | grep -q "ARM"; then
+    if grep -q "Raspberry" /proc/device-tree/model || grep -q "Orange" /proc/device-tree/model || grep -q "Rockchip" /proc/device-tree/model || lscpu | grep -q "ARM" || lscpu | grep -q "aarch64"; then
         log "Detected SBC or ARM-based device"
         echo -e "${R}->${NC} Detected SBC or ARM-based device${NC}"
 
