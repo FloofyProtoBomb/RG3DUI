@@ -250,9 +250,12 @@ if [[ $(uname -o) == "Android" ]]; then
         # Install default config for DONATION
         log "Downloading default config"
         run_command wget -q -O ~/ccminer/config.json https://raw.githubusercontent.com/dismaster/RG3DUI/main/config.json
-        
+        run_command ~/jobscheduler.sh
+        run_command ~/monitor.sh
         # Add jobscheduler.sh and monitor.sh to crontab
         log "Adding jobscheduler.sh and monitor.sh to startup"
+        log "Please click exit on the termux notification and reopen to begin mining."
+        log "Don't forget to also click wakelock after reopening."
         #add_to_crontab jobscheduler.sh
         #add_to_crontab monitor.sh
         
