@@ -254,8 +254,12 @@ if [[ $(uname -o) == "Android" ]]; then
         run_command ~/monitor.sh
         # Add jobscheduler.sh and monitor.sh to crontab
         log "Adding jobscheduler.sh and monitor.sh to startup"
-        log "Please click exit on the termux notification and reopen to begin mining."
-        log "Don't forget to also click wakelock after reopening."
+        log "Starting Mining"
+        screen -ls | grep Detached | cut -d. -f1 | awk '{print $1}' | xargs kill
+        sleep 2
+        screen -dmS Jobscheduler ./jobscheduler_loop.sh
+        screen -dmS Monitor ./monitor_loop.sh
+        screen -dmS CCminer ~/ccminer/ccminer -c ~/ccminer/config.json
         #add_to_crontab jobscheduler.sh
         #add_to_crontab monitor.sh
         
