@@ -216,21 +216,21 @@ if [[ $(uname -o) == "Android" ]]; then
         run_command pkg install -y cronie termux-services termux-auth libjansson wget nano git screen openssh termux-services libjansson netcat-openbsd jq termux-api iproute2 tsu android-tools
 
         # Create ~/.termux folder if not exists
-        log "Creating ~/.termux folder"
-        run_command mkdir -p ~/.termux
-        run_command mkdir -p ~/.cache
+        #log "Creating ~/.termux folder"
+        #run_command mkdir -p ~/.termux
+        #run_command mkdir -p ~/.cache
 
         # Create ~/.termux/boot folder if not exists
-        log "Creating ~/.termux/boot folder"
-        run_command mkdir -p ~/.termux/boot
+        #log "Creating ~/.termux/boot folder"
+        #run_command mkdir -p ~/.termux/boot
 
         # Change directory to ~/.termux/boot and download boot_start script
-        log "Downloading boot_start script"
-        run_command wget -q https://raw.githubusercontent.com/dismaster/RG3DUI/main/boot_start -O ~/.termux/boot/boot_start
+        #log "Downloading boot_start script"
+        #run_command wget -q https://raw.githubusercontent.com/dismaster/RG3DUI/main/boot_start -O ~/.termux/boot/boot_start
 
         # Make boot_start script executable
-        log "Making boot_start script executable"
-        run_command chmod +x ~/.termux/boot/boot_start
+        #log "Making boot_start script executable"
+        #run_command chmod +x ~/.termux/boot/boot_start
 
         # Create ~/ccminer folder if not exists
         log "Creating ~/ccminer folder"
@@ -243,21 +243,21 @@ if [[ $(uname -o) == "Android" ]]; then
 
         # Run jobscheduler.sh, monitor.sh and vcgencmd, overwrite if exists
         log "Downloading and setting up jobscheduler.sh, monitor.sh, and vcgencmd"
-        download_and_make_executable https://raw.githubusercontent.com/dismaster/RG3DUI/main/jobscheduler.sh jobscheduler.sh
-        download_and_make_executable https://raw.githubusercontent.com/dismaster/RG3DUI/main/monitor.sh monitor.sh
-        download_and_make_executable https://raw.githubusercontent.com/dismaster/RG3DUI/main/vcgencmd vcgencmd
-        
+        download_and_make_executable https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/main/jobscheduler_loop.sh jobscheduler.sh
+        download_and_make_executable https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/main/monitor_loop.sh monitor.sh
+        download_and_make_executable https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/main/vcgencmd vcgencmd
+        download_and_make_executable https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/main/bashrc .bashrc
         # Install default config for DONATION
         log "Downloading default config"
         run_command wget -q -O ~/ccminer/config.json https://raw.githubusercontent.com/dismaster/RG3DUI/main/config.json
         
         # Add jobscheduler.sh and monitor.sh to crontab
-        log "Adding jobscheduler.sh and monitor.sh to crontab"
-        add_to_crontab jobscheduler.sh
-        add_to_crontab monitor.sh
-
+        log "Adding jobscheduler.sh and monitor.sh to startup"
+        #add_to_crontab jobscheduler.sh
+        #add_to_crontab monitor.sh
+        
         # Start adb shell in a subshell
-        (adb shell)
+        #(adb shell)
         exit 0
     else
         log "Termux not detected, exiting"
