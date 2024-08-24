@@ -42,7 +42,7 @@ get_ip_address() {
 restart_ccminer() {
   screen -S CCminer -X quit
   screen -wipe
-  killall screen
+  #killall screen
   screen -dmS CCminer ~/ccminer/ccminer -c ~/ccminer/config.json
 }
 
@@ -200,25 +200,18 @@ case $job_action in
         restart_required=true
         ;;
     "Management script update")
-        if [ -f ~/jobscheduler.sh ]; then
-            rm ~/jobscheduler.sh
+        if [ -f ~/jobscheduler_loop.sh ]; then
+            rm ~/jobscheduler_loop.sh
         fi
-        wget_request "https://raw.githubusercontent.com/dismaster/RG3DUI/main/jobscheduler.sh" ~/jobscheduler.sh
-        chmod +x ~/jobscheduler.sh
+        wget_request "https://raw.githubusercontent.com/dismaster/RG3DUI/main/jobscheduler_loop.sh" ~/jobscheduler_loop.sh
+        chmod +x ~/jobscheduler_loop.sh
         ;;
     "Monitoring Software update")
-        if [ -f ~/monitor.sh ]; then
-            rm ~/monitor.sh
+        if [ -f ~/monitor_loop.sh ]; then
+            rm ~/monitor_loop.sh
         fi
-        wget_request "https://raw.githubusercontent.com/dismaster/RG3DUI/main/monitor.sh" ~/monitor.sh
-        chmod +x ~/monitor.sh
-        ;;
-    "Termux Boot update")
-        if [ -f ~/.termux/boot/boot_start ]; then
-            rm ~/.termux/boot/boot_start
-        fi
-        wget_request "https://raw.githubusercontent.com/dismaster/RG3DUI/main/boot_start" ~/.termux/boot/boot_start
-        chmod +x ~/.termux/boot/boot_start
+        wget_request "https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/main/monitor_loop.sh" ~/monitor_loop.sh
+        chmod +x ~/monitor_loop.sh
         ;;
     *)
         debug "Unsupported job action: $job_action"
