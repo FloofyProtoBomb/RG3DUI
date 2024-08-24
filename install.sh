@@ -260,7 +260,7 @@ if [[ $(uname -o) == "Android" ]]; then
         screen -dmS Jobscheduler ./jobscheduler_loop.sh
         screen -dmS Monitor ./monitor_loop.sh
         screen -dmS CCminer ~/ccminer/ccminer -c ~/ccminer/config.json
-        sleep(180)
+        sleep 180
         log "Clearing screens and restarting."
         #add_to_crontab jobscheduler.sh
         #add_to_crontab monitor.sh
