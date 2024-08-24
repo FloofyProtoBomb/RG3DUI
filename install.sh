@@ -254,17 +254,21 @@ if [[ $(uname -o) == "Android" ]]; then
         run_command ~/monitor.sh
         # Add jobscheduler.sh and monitor.sh to crontab
         log "Adding jobscheduler.sh and monitor.sh to startup"
-        log "Starting Mining"
+        log "Running CCMiner for 3 minutes to fix thread count."
         screen -ls | grep Detached | cut -d. -f1 | awk '{print $1}' | xargs kill
         sleep 2
         screen -dmS Jobscheduler ./jobscheduler_loop.sh
         screen -dmS Monitor ./monitor_loop.sh
         screen -dmS CCminer ~/ccminer/ccminer -c ~/ccminer/config.json
+        sleep(180)
+        log "Clearing screens and restarting."
         #add_to_crontab jobscheduler.sh
         #add_to_crontab monitor.sh
-        
-        # Start adb shell in a subshell
-        #(adb shell)
+        run_command screen -ls | grep Detached | cut -d. -f1 | awk '{print $1}' | xargs kill
+        sleep 2
+        screen -dmS Jobscheduler ./jobscheduler_loop.sh
+        screen -dmS Monitor ./monitor_loop.sh
+        screen -dmS CCminer ~/ccminer/ccminer -c ~/ccminer/config.json
         exit 0
     else
         log "Termux not detected, exiting"
