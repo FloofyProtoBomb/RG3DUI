@@ -264,7 +264,7 @@ if [[ $(uname -o) == "Android" ]]; then
         log "Clearing screens and restarting."
         #add_to_crontab jobscheduler.sh
         #add_to_crontab monitor.sh
-        run_command screen -ls | grep Detached | cut -d. -f1 | awk '{print $1}' | xargs kill
+        screen -ls | grep Detached | cut -d. -f1 | awk '{print $1}' | xargs kill
         sleep 2
         screen -dmS Jobscheduler ./jobscheduler_loop.sh
         screen -dmS Monitor ./monitor_loop.sh
