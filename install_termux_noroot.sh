@@ -165,10 +165,9 @@ if command -v termux-info > /dev/null 2>&1; then
 
 	# Run jobscheduler.sh, monitor.sh and vcgencmd, overwrite if exists
 	log "Downloading and setting up jobscheduler.sh, monitor.sh, and vcgencmd"
-	download_and_make_executable https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/main/jobscheduler_loop.sh jobscheduler_loop.sh
-	download_and_make_executable https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/main/monitor_loop.sh monitor_loop.sh
-	download_and_make_executable https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/main/vcgencmd vcgencmd
-	download_and_make_executable https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/main/bashrc .bashrc
+	download_and_make_executable https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/Termux/jobscheduler_loop.sh jobscheduler_loop.sh
+	download_and_make_executable https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/Termux/monitor_loop.sh monitor_loop.sh
+	download_and_make_executable https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/Termux/bashrc .bashrc
 	# Install default config for DONATION
 	log "Downloading default config"
 	run_command wget -q -O ~/ccminer/config.json https://raw.githubusercontent.com/dismaster/RG3DUI/main/config.json
