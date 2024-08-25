@@ -148,7 +148,7 @@ while true; do
   mac_start_time=$(date +%s%N)
   if [ -n "$(uname -o | grep Android)" ]; then
     # For Android
-    mac=$(getprop persist.sys.wifi_mac)
+    mac=$(getprop persist.sys.wifi_mac | s/:/-/g)
     if [ -z "$mac" ]; then
       # If no MAC address was found, set to null
       mac="null"
@@ -197,7 +197,7 @@ fi
 
   for cpuseq in $(seq 1 60); do
     v1=$(cat /sys/devices/virtual/thermal/thermal_zone$cpuseq/type 2>/dev/null)
-    v2="back_temp"
+    v2="soc"
     if [[ "$v1" == "$v2" ]]; then
       cpu_temp_raw=$(cat /sys/devices/virtual/thermal/thermal_zone$cpuseq/temp 2>/dev/null)
       cpu_temp=$((cpu_temp_raw / 1000))
