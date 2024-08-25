@@ -154,7 +154,6 @@ while true; do
       mac="null"
     fi
   fi
-
   measure_time "MAC address retrieval" $mac_start_time
 
   # 5. Check if ccminer is running, exit if not
@@ -191,9 +190,8 @@ while true; do
     fi
   done
   measure_time "Battery status check" $battery_start_time
-fi
-
-# 9. Check CPU temperature
+  
+  # 9. Check CPU temperature
 
   for cpuseq in $(seq 1 60); do
     v1=$(cat /sys/devices/virtual/thermal/thermal_zone$cpuseq/type 2>/dev/null)
@@ -204,27 +202,34 @@ fi
       break
     fi
   done
-fi
-
-# Format cpu_temp as JSON
+  
+  # Format cpu_temp as JSON
 cpu_temp_json="{\"temp\":\"$cpu_temp\"}"
 batt_temp_json="{\"temperature\":\"$batt_temp\"}"
-
   # Get the scheduler version from the jobscheduler.sh file
   scheduler_version_start_time=$(date +%s%N)
   scheduler_version=$(grep -E "^VERSION=" ~/jobscheduler_loop.sh | cut -d '=' -f 2 | tr -d '"')
   measure_time "Scheduler version check" $scheduler_version_start_time
-
-  # Send data to PHP script or echo if dryrun
-  #send_data_start_time=$(date +%s%N)
-  #send_data
   measure_time "Data sending" $send_data_start_time
+  
 echo "CPU TEMP: $cpu_temp"
 echo "CPU TEMP: JSON $cpu_temp_json"
 echo "BATT TEMP: $back_temp"
 echo "BATT TEMP JSON: $batt_temp_json"
 echo "MAC ADDR: $mac"
 echo "CPU COUNT: $cpu_count"
+
+fi
+
+
+
+
+
+
+
+  # Send data to PHP script or echo if dryrun
+  #send_data_start_time=$(date +%s%N)
+  #send_data
 
 
   # Calculate and display overall execution time
