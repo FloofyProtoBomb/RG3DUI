@@ -216,9 +216,16 @@ batt_temp_json="{\"temperature\":\"$batt_temp\"}"
   measure_time "Scheduler version check" $scheduler_version_start_time
 
   # Send data to PHP script or echo if dryrun
-  send_data_start_time=$(date +%s%N)
-  send_data
+  #send_data_start_time=$(date +%s%N)
+  #send_data
   measure_time "Data sending" $send_data_start_time
+echo "CPU TEMP: $cpu_temp"
+echo "CPU TEMP: JSON $cpu_temp_json"
+echo "BATT TEMP: $back_temp"
+echo "BATT TEMP JSON: $batt_temp_json"
+echo "MAC ADDR: $mac"
+echo "CPU COUNT: $cpu_count"
+
 
   # Calculate and display overall execution time
   measure_time "Overall execution" $overall_start_time
