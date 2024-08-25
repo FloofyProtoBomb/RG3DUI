@@ -181,13 +181,12 @@ while true; do
 
   # 8. Check battery status if OS is Termux
   battery_start_time=$(date +%s%N)
-  if [ "$(uname -o)" == "Android" ]; then
     for battseq in $(seq 1 60); do
     v1=$(cat /sys/devices/virtual/thermal/thermal_zone$battseq/type 2>/dev/null)
     v2="battery"
     if [[ "$v1" == "$v2" ]]; then
       batt_temp_raw=$(cat /sys/devices/virtual/thermal/thermal_zone$battseq/temp 2>/dev/null)
-      batt_temp=$((cpu_temp_raw / 1000))
+      batt_temp=$((batt_temp_raw / 1000))
       break
     fi
   done
@@ -197,7 +196,6 @@ fi
 # 9. Check CPU temperature
 cpu_temp=0
 
-if [ "$cpu_temp" == "0" ] || [ -z "$cpu_temp" ]; then
   for cpuseq in $(seq 1 60); do
     v1=$(cat /sys/devices/virtual/thermal/thermal_zone$cpuseq/type 2>/dev/null)
     v2="back_temp"
