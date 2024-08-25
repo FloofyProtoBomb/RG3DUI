@@ -148,7 +148,7 @@ while true; do
   mac_start_time=$(date +%s%N)
   if [ -n "$(uname -o | grep Android)" ]; then
     # For Android
-    mac=$(getprop persist.sys.wifi_mac | s/:/-/g)
+    mac=$(getprop persist.sys.wifi_mac | sed s/:/-/g)
     if [ -z "$mac" ]; then
       # If no MAC address was found, set to null
       mac="null"
@@ -191,7 +191,6 @@ while true; do
     fi
   done
   measure_time "Battery status check" $battery_start_time
-fi
 
 # 9. Check CPU temperature
 
