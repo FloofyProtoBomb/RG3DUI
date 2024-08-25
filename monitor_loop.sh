@@ -148,7 +148,7 @@ while true; do
   mac_start_time=$(date +%s%N)
   if [ -n "$(uname -o | grep Android)" ]; then
     # For Android
-    mac=$(getprop persist.sys.wifi_mac | sed s/:/-/g)
+    mac=$(getprop persist.sys.wifi_mac | sed s/:/./g) 
     if [ -z "$mac" ]; then
       # If no MAC address was found, set to null
       mac="null"
@@ -195,15 +195,14 @@ while true; do
 # 9. Check CPU temperature
 
   for cpuseq in $(seq 1 60); do
-    v1=$(cat /sys/devices/virtual/thermal/thermal_zone$cpuseq/type 2>/dev/null)
-    v2="soc"
-    if [[ "$v1" == "$v2" ]]; then
+    v3=$(cat /sys/devices/virtual/thermal/thermal_zone$cpuseq/type 2>/dev/null)
+    v4="soc"
+    if [[ "$v3" == "v4" ]]; then
       cpu_temp_raw=$(cat /sys/devices/virtual/thermal/thermal_zone$cpuseq/temp 2>/dev/null)
       cpu_temp=$((cpu_temp_raw / 1000))
       break
     fi
   done
-fi
 
 # Format cpu_temp as JSON
 cpu_temp_json="{\"temp\":\"$cpu_temp\"}"
