@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Version number
-VERSION="1.0.8"
+VERSION="1.0t"
 
 # Function to check if API URL is reachable with SSL
 check_ssl_support() {
@@ -16,7 +16,7 @@ check_ssl_support() {
 # Function to send data to PHP script or echo if dryrun
 send_data() {
   local url="https://api.rg3d.eu:8443/api.php"
-  local data="hw_brand=$hw_brand&hw_model=$hw_model&ip=$ip&summary=$summary_json&pool=$pool_json&battery=$battery&cpu_temp=$cpu_temp_json&cpu_max=$cpu_count&password=$rig_pw&monitor_version=$VERSION&scheduler_version=$scheduler_version"
+  local data="hw_brand=$hw_brand&hw_model=$hw_model&ip=$mac&summary=$summary_json&pool=$pool_json&battery=$batt_temp_json&cpu_temp=$cpu_temp_json&cpu_max=$cpu_count&password=$rig_pw&monitor_version=$VERSION&scheduler_version=$scheduler_version"
 
   if [ -n "$miner_id" ]; then
     data+="&miner_id=$miner_id"
@@ -104,22 +104,6 @@ while true; do
   cpu_count=$(lscpu | grep -E '^CPU\(s\):' | awk '{print $2}')
   measure_time "CPU count retrieval" $cpu_start_time
 
-  # Check if connectivity to Internet is given
-  internet_check_start_time=$(date +%s%N)
-  x=$(ping -c1 google.com 2>&1 | grep unknown)
-  if [ ! "$x" = "" ]; then
-    # For Android if connection is down try to restart Wifi network
-    if su -c true 2>/dev/null; then
-      # SU rights are available
-      echo "Connection to Internet broken. Restarting Network!"
-      su -c input keyevent 26
-      su -c svc wifi disable
-      su -c svc wifi enable
-      sleep 10
-    fi
-  fi
-  measure_time "Internet connectivity check" $internet_check_start_time
-
   # Parse arguments
   dryrun=false
   if [ "$1" == "--dryrun" ]; then
@@ -143,23 +127,16 @@ while true; do
 
   # 2. Check hardware brand and format to uppercase
   hw_start_time=$(date +%s%N)
-  if [ -f /sys/firmware/devicetree/base/model ]; then
-    hw_brand=$(cat /sys/firmware/devicetree/base/model | awk '{print $1}' | tr '[:lower:]' '[:upper:]')
-  elif [ -n "$(uname -o | grep Android)" ]; then
+  if [ -n "$(uname -o | grep Android)" ]; then
     hw_brand=$(getprop ro.product.brand | tr '[:lower:]' '[:upper:]')
-  elif [ "$(uname -s)" == "Linux" ]; then
-    # For GNU/Linux systems, fetch PRETTY_NAME from lsb_release -a
-    hw_brand=$(lsb_release -a 2>/dev/null | grep "Description:" | cut -d ':' -f 2- | sed 's/^[ \t]*//;s/[ \t]*$//')
   else
-    hw_brand=$(uname -o | tr '[:lower:]' '[:upper:]')
+    hw_brand="ERR"
   fi
   measure_time "Hardware brand check" $hw_start_time
 
   # 3. Check hardware model and format to uppercase
   model_start_time=$(date +%s%N)
-  if [ -f /sys/firmware/devicetree/base/model ]; then
-    hw_model=$(cat /sys/firmware/devicetree/base/model | awk '{print $2 $3}')
-  elif [ -n "$(uname -o | grep Android)" ]; then
+  if [ -n "$(uname -o | grep Android)" ]; then
     hw_model=$(getprop ro.product.model)
   else
     hw_model=$(uname -m)
@@ -167,23 +144,18 @@ while true; do
   hw_model=$(echo "$hw_model" | tr '[:lower:]' '[:upper:]')
   measure_time "Hardware model check" $model_start_time
 
-  # 4. Get local IP address (prefer ethernet over wlan, IPv4 only)
-  ip_start_time=$(date +%s%N)
+  # 4. Get MAC address
+  mac_start_time=$(date +%s%N)
   if [ -n "$(uname -o | grep Android)" ]; then
     # For Android
-    # First try without 'su'
-    ip=$(ifconfig 2> /dev/null | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '[0-9.]*' | grep -v 127.0.0.1)
-    if [ -z "$ip" ]; then  # If no IP address was found, try with 'su' rights
-      if su -c true 2>/dev/null; then
-        # SU rights are available
-        ip=$(su -c ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v 127.0.0.1)
-      fi
+    mac=$(getprop persist.sys.wifi_mac)
+    if [ -z "$mac" ]; then
+      # If no MAC address was found, set to null
+      mac="null"
     fi
-  else
-    # For other Unix systems
-    ip=$(ip -4 -o addr show | awk '$2 !~ /lo|docker/ {print $4}' | cut -d "/" -f 1 | head -n 1)
   fi
-  measure_time "IP address retrieval" $ip_start_time
+
+  measure_time "MAC address retrieval" $mac_start_time
 
   # 5. Check if ccminer is running, exit if not
   miner_check_start_time=$(date +%s%N)
@@ -210,45 +182,21 @@ while true; do
   # 8. Check battery status if OS is Termux
   battery_start_time=$(date +%s%N)
   if [ "$(uname -o)" == "Android" ]; then
-    # Check if the battery command returns a value within 2 seconds
-    battery=$(timeout 2s termux-battery-status | jq -c '.')
-    if [ -z "$battery" ]; then
-      battery="{}"
+    for battseq in $(seq 1 60); do
+    v1=$(cat /sys/devices/virtual/thermal/thermal_zone$battseq/type 2>/dev/null)
+    v2="battery"
+    if [[ "$v1" == "$v2" ]]; then
+      batt_temp_raw=$(cat /sys/devices/virtual/thermal/thermal_zone$battseq/temp 2>/dev/null)
+      batt_temp=$((cpu_temp_raw / 1000))
+      break
     fi
-  else
-    battery="{}"
-  fi
+  done
   measure_time "Battery status check" $battery_start_time
+fi
 
 # 9. Check CPU temperature
 cpu_temp=0
 
-# Check for Raspberry Pi or other Linux systems
-if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
-  cpu_temp=$(awk '{printf "%.1f", $1 / 1000}' /sys/class/thermal/thermal_zone0/temp)
-fi
-
-# If still zero, check for Android devices
-if [ "$cpu_temp" == "0" ] || [ -z "$cpu_temp" ]; then
-  if [ -n "$(uname -o | grep Android)" ]; then
-    # Attempt to get temperature without SU first
-    cpu_temp_raw=$("~/vcgencmd measure_temp" 2>/dev/null)
-    cpu_temp=$(echo "$cpu_temp_raw" | grep -oP 'temp=\K\d+\.\d+')
-
-    # If no valid temperature was obtained, try with SU
-    if ! [[ "$cpu_temp" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
-      cpu_temp_raw=$(su -c ~/vcgencmd measure_temp 2>/dev/null)
-      cpu_temp=$(echo "$cpu_temp_raw" | grep -oP 'temp=\K\d+\.\d+')
-    fi
-
-    # Check if the temperature is still not valid or if the command simply failed
-    if ! [[ "$cpu_temp" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
-      cpu_temp=0
-    fi
-  fi
-fi
-
-# Additional check if cpu_temp is still 0
 if [ "$cpu_temp" == "0" ] || [ -z "$cpu_temp" ]; then
   for cpuseq in $(seq 1 60); do
     v1=$(cat /sys/devices/virtual/thermal/thermal_zone$cpuseq/type 2>/dev/null)
@@ -263,6 +211,7 @@ fi
 
 # Format cpu_temp as JSON
 cpu_temp_json="{\"temp\":\"$cpu_temp\"}"
+batt_temp_json="{\"temperature\":\"$batt_temp\"}"
 
   # Get the scheduler version from the jobscheduler.sh file
   scheduler_version_start_time=$(date +%s%N)

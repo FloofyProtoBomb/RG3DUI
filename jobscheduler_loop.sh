@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Version number
-VERSION="1.1.0"
+VERSION="1.0t"
 
 # Enable debugging if -debug argument is provided
 DEBUG=false
@@ -16,33 +16,24 @@ debug() {
   fi
 }
 
-# Function to get the IP address
-get_ip_address() {
+# Function to get the MAC address
+get_mac_address() {
   if [ -n "$(uname -o | grep Android)" ]; then
     # For Android
-    ip=$(ifconfig 2> /dev/null | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '[0-9.]*' | grep -v 127.0.0.1)
-    if [ -z "$ip" ]; then
-      # If no IP address was found, try with 'ifconfig' and 'su'
-      ip=$(su -c "ifconfig" 2>/dev/null | grep -oP '(?<=inet addr:)\d+(\.\d+){3}' | grep -v 127.0.0.1)
-      if [ -z "$ip" ]; then
-        if su -c true 2>/dev/null; then
-          # SU rights are available
-          ip=$(su -c "ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v 127.0.0.1")
-        fi
-      fi
+    mac=$(getprop persist.sys.wifi_mac)
+    if [ -z "$mac" ]; then
+      # If no MAC address was found, set to null
+      mac="null"
     fi
-  else
-    # For other Unix systems
-    ip=$(ip -4 -o addr show | awk '$2 !~ /lo|docker/ {print $4}' | cut -d "/" -f 1 | head -n 1)
   fi
-  echo $ip
+  echo $mac
 }
 
 # Function to restart ccminer
 restart_ccminer() {
   screen -S CCminer -X quit
   screen -wipe
-  killall screen
+  sleep 1
   screen -dmS CCminer ~/ccminer/ccminer -c ~/ccminer/config.json
 }
 
@@ -117,8 +108,8 @@ wget_request() {
 rig_pw=$(grep 'rig_pw' ~/rig.conf | cut -d '=' -f 2 | tr -d ' ')
 miner_id=$(grep 'miner_id' ~/rig.conf | cut -d '=' -f 2 | tr -d ' ')
 
-# Get the IP address
-miner_ip=$(get_ip_address)
+# Get the mac address
+miner_mac=$(get_mac_address)
 
 # Main loop
 while true; do
@@ -127,7 +118,7 @@ while true; do
   check_internet_connection
 
   # Prepare POST data
-  post_data="rig_pw=$rig_pw&miner_ip=$miner_ip"
+  post_data="rig_pw=$rig_pw&miner_ip=$miner_mac"
   [ -n "$miner_id" ] && post_data+="&miner_id=$miner_id"
 
   # Send data to PHP script and get response
@@ -207,22 +198,15 @@ while true; do
           if [ -f ~/jobscheduler_loop.sh ]; then
               rm ~/jobscheduler_loop.sh
           fi
-          wget_request "https://raw.githubusercontent.com/dismaster/RG3DUI/main/jobscheduler_loop.sh" ~/jobscheduler_loop.sh
+          wget_request "https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/Termux/jobscheduler_loop.sh" ~/jobscheduler_loop.sh
           chmod +x ~/jobscheduler_loop.sh
           ;;
       "Monitoring Software update")
           if [ -f ~/monitor_loop.sh ]; then
               rm ~/monitor_loop.sh
           fi
-          wget_request "https://raw.githubusercontent.com/dismaster/RG3DUI/main/monitor_loop.sh" ~/monitor_loop.sh
+          wget_request "https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/Termux/monitor_loop.sh" ~/monitor_loop.sh
           chmod +x ~/monitor_loop.sh
-          ;;
-      "Termux Boot update")
-          if [ -f ~/.termux/boot/boot_start ]; then
-              rm ~/.termux/boot/boot_start
-          fi
-          wget_request "https://raw.githubusercontent.com/dismaster/RG3DUI/main/boot_start" ~/.termux/boot/boot_start
-          chmod +x ~/.termux/boot/boot_start
           ;;
       *)
           debug "Unsupported job action: $job_action"
