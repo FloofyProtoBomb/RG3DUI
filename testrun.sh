@@ -154,6 +154,7 @@ while true; do
       mac="null"
     fi
   fi
+
   measure_time "MAC address retrieval" $mac_start_time
 
   # 5. Check if ccminer is running, exit if not
@@ -202,34 +203,29 @@ while true; do
       break
     fi
   done
-  
-  # Format cpu_temp as JSON
+fi
+
+
+
+# Format cpu_temp as JSON
 cpu_temp_json="{\"temp\":\"$cpu_temp\"}"
 batt_temp_json="{\"temperature\":\"$batt_temp\"}"
+
   # Get the scheduler version from the jobscheduler.sh file
   scheduler_version_start_time=$(date +%s%N)
   scheduler_version=$(grep -E "^VERSION=" ~/jobscheduler_loop.sh | cut -d '=' -f 2 | tr -d '"')
   measure_time "Scheduler version check" $scheduler_version_start_time
+
+  # Send data to PHP script or echo if dryrun
+  #send_data_start_time=$(date +%s%N)
+  #send_data
   measure_time "Data sending" $send_data_start_time
-  
 echo "CPU TEMP: $cpu_temp"
 echo "CPU TEMP: JSON $cpu_temp_json"
 echo "BATT TEMP: $back_temp"
 echo "BATT TEMP JSON: $batt_temp_json"
 echo "MAC ADDR: $mac"
 echo "CPU COUNT: $cpu_count"
-
-fi
-
-
-
-
-
-
-
-  # Send data to PHP script or echo if dryrun
-  #send_data_start_time=$(date +%s%N)
-  #send_data
 
 
   # Calculate and display overall execution time
