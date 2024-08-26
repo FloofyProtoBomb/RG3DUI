@@ -2,7 +2,6 @@
 
 # Version number
 VERSION="1.0t"
-
 # Function to check if API URL is reachable with SSL
 check_ssl_support() {
   local url="https://api.rg3d.eu:8443/api.php"
@@ -185,8 +184,7 @@ while true; do
       batt_temp=$((batt_temp_raw / 1000))
     fi
 	if [[ "$v1" == "$v3" ]]; then
-      cpu_temp_raw=$(cat /sys/devices/virtual/thermal/thermal_zone$thermalz/temp 2>/dev/null)
-      cpu_temp=$((cpu_temp_raw / 1000))
+      cpu_temp=$(cat /sys/devices/virtual/thermal/thermal_zone$thermalz/temp 2>/dev/null)
     fi
   done
   measure_time "Battery status check" $battery_start_time
@@ -198,6 +196,7 @@ while true; do
       cpu_temp_raw=$(cat /sys/devices/virtual/thermal/thermal_zone$thermalz/temp 2>/dev/null)
       cpu_temp=$((cpu_temp_raw / 1000))
     fi
+	done
   fi
   if [[ "$cpu_temp" == 0 ]]; then
 	termux-toast "CPU TEMP NOT RECOGNIZED, PLEASE OPEN AN ISSUE ON GITHUB"
