@@ -73,7 +73,6 @@ measure_time() {
   local start_time=$2
   local end_time=$(date +%s%N)
   local elapsed=$((end_time - start_time))
-  echo "$label took $(echo "scale=3; $elapsed / 1000000000" | bc) seconds"
 }
 
 # Start the monitoring loop
