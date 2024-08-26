@@ -176,7 +176,7 @@ while true; do
 
   # 8. Check battery status if OS is Termux
   battery_start_time=$(date +%s%N)
-    for thermalz in $(seq 1 70); do || true
+    for thermalz in $(seq 1 70); do
     v1=$(cat /sys/devices/virtual/thermal/thermal_zone$thermalz/type || true)
     v2="battery"
 	v3="soc"
