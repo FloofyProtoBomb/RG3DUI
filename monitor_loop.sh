@@ -176,28 +176,25 @@ while true; do
 
   # 8. Check battery status if OS is Termux
   battery_start_time=$(date +%s%N)
-    for battseq in $(seq 1 60); do
-    v1=$(cat /sys/devices/virtual/thermal/thermal_zone$battseq/type 2>/dev/null)
+    for thermalz in $(seq 1 70); do
+    v1=$(cat /sys/devices/virtual/thermal/thermal_zone$thermalz/type 2>/dev/null)
     v2="battery"
+	v3="soc"
+	v4="back_temp"
     if [[ "$v1" == "$v2" ]]; then
-      batt_temp_raw=$(cat /sys/devices/virtual/thermal/thermal_zone$battseq/temp 2>/dev/null)
+      batt_temp_raw=$(cat /sys/devices/virtual/thermal/thermal_zone$thermalz/temp 2>/dev/null)
       batt_temp=$((batt_temp_raw / 1000))
-      break
+    fi
+	if [[ "$v1" == "$v3" ]]; then
+      cpu_temp_raw=$(cat /sys/devices/virtual/thermal/thermal_zone$thermalz/temp 2>/dev/null)
+      cpu_temp=$((batt_temp_raw / 1000))
+    fi
+	if [[ "$v1" == "$v4" ]]; then
+      cpu_temp_raw=$(cat /sys/devices/virtual/thermal/thermal_zone$thermalz/temp 2>/dev/null)
+      cpu_temp=$((batt_temp_raw / 1000))
     fi
   done
   measure_time "Battery status check" $battery_start_time
-
-# 9. Check CPU temperature
-
-  for cpuseq in $(seq 1 80); do
-    v3=$(cat /sys/devices/virtual/thermal/thermal_zone$cpuseq/type 2>/dev/null)
-    v4="soc"
-    if [[ "$v3" == "$v4" ]]; then
-      cpu_temp_raw=$(cat /sys/devices/virtual/thermal/thermal_zone$cpuseq/temp 2>/dev/null)
-      cpu_temp=$((cpu_temp_raw / 1000))
-      break
-    fi
-  done
   if [[ "$cpu_temp" == 0 ]]; then
 	termux-toast "CPU TEMP NOT RECOGNIZED, PLEASE OPEN AN ISSUE ON GITHUB"
   fi
