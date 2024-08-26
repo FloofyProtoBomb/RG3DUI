@@ -173,19 +173,20 @@ if command -v termux-info > /dev/null 2>&1; then
 	run_command wget -q -O ~/ccminer/config.json https://raw.githubusercontent.com/dismaster/RG3DUI/main/config.json
 	# Add jobscheduler.sh and monitor.sh to crontab
 	log "Adding jobscheduler.sh and monitor.sh to startup"
-	log "Running CCMiner for 3 minutes to fix thread count."
+	#log "Running CCMiner for 3 minutes to fix thread count."
 	run_command screen -ls | grep Detached | cut -d. -f1 | awk '{print $1}' | xargs kill
 	sleep 2
-	run_command screen -dmS Jobscheduler ./jobscheduler_loop.sh
-	run_command screen -dmS Monitor ./monitor_loop.sh
-	run_command screen -dmS CCminer ~/ccminer/ccminer -c ~/ccminer/config.json
-	sleep 180
-	log "Clearing screens and restarting."
-	run_command screen -ls | grep Detached | cut -d. -f1 | awk '{print $1}' | xargs kill
-	sleep 2
-	run_command screen -dmS Jobscheduler ./jobscheduler_loop.sh
-	run_command screen -dmS Monitor ./monitor_loop.sh
-	run_command screen -dmS CCminer ~/ccminer/ccminer -c ~/ccminer/config.json
+	#run_command screen -dmS Jobscheduler ./jobscheduler_loop.sh
+	#run_command screen -dmS Monitor ./monitor_loop.sh
+	#run_command screen -dmS CCminer ~/ccminer/ccminer -c ~/ccminer/config.json
+	#sleep 180
+	#log "Clearing screens and restarting."
+	#run_command screen -ls | grep Detached | cut -d. -f1 | awk '{print $1}' | xargs kill
+	#sleep 2
+	#run_command screen -dmS Jobscheduler ./jobscheduler_loop.sh
+	#run_command screen -dmS Monitor ./monitor_loop.sh
+	#run_command screen -dmS CCminer ~/ccminer/ccminer -c ~/ccminer/config.json
+ 	run_command termux-toast "Please Relaunch Termux"
 	exit 0
 else
 	log "Termux not detected, exiting"
