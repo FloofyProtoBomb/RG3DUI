@@ -186,14 +186,22 @@ while true; do
     fi
 	if [[ "$v1" == "$v3" ]]; then
       cpu_temp_raw=$(cat /sys/devices/virtual/thermal/thermal_zone$thermalz/temp 2>/dev/null)
-      cpu_temp=$((batt_temp_raw / 1000))
+      cpu_temp=$((cpu_temp_raw / 1000))
     fi
   done
   measure_time "Battery status check" $battery_start_time
   if [[ "$cpu_temp" == 0 ]]; then
+	for thermalz in $(seq 1 70); do
+		v1=$(cat /sys/devices/virtual/thermal/thermal_zone$thermalz/type || true)
+		v2="back_temp"
+    if [[ "$v1" == "$v2" ]]; then
+      cpu_temp_raw=$(cat /sys/devices/virtual/thermal/thermal_zone$thermalz/temp 2>/dev/null)
+      cpu_temp=$((cpu_temp_raw / 1000))
+    fi
+  fi
+  if [[ "$cpu_temp" == 0 ]]; then
 	termux-toast "CPU TEMP NOT RECOGNIZED, PLEASE OPEN AN ISSUE ON GITHUB"
   fi
-
   # Format cpu_temp as JSON
   cpu_temp_json="{\"temp\":\"$cpu_temp\"}"
   batt_temp_json="{\"temperature\":\"$batt_temp\"}"
