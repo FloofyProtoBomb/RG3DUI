@@ -16,17 +16,18 @@ debug() {
   fi
 }
 
-# Function to get the MAC address
-get_mac_address() {
+# Function to get the IP address
+get_ip_address() {
   if [ -n "$(uname -o | grep Android)" ]; then
     # For Android
-    mac=$(getprop persist.sys.wifi_mac)
-    if [ -z "$mac" ]; then
-      # If no MAC address was found, set to null
-      mac="null"
+    ip=$(termux-wifi-connectioninfo | grep -oP '(?<="VpcId": ")[^"]*')
+    if [ -z "$ip" ]; then
+      # If no IP address was found, set to null
+      termux-toast -s "Unable to obtain IP Address, setting to 127.0.0.1"
+      ip="127.0.0.1"
     fi
   fi
-  echo $mac
+  echo $ip
 }
 
 # Function to restart ccminer
@@ -108,8 +109,8 @@ wget_request() {
 rig_pw=$(grep 'rig_pw' ~/rig.conf | cut -d '=' -f 2 | tr -d ' ')
 miner_id=$(grep 'miner_id' ~/rig.conf | cut -d '=' -f 2 | tr -d ' ')
 
-# Get the mac address
-miner_mac=$(get_mac_address)
+# Get the ip address
+miner_ip=$(get_ip_address)
 
 # Main loop
 while true; do
@@ -118,7 +119,7 @@ while true; do
   check_internet_connection
 
   # Prepare POST data
-  post_data="rig_pw=$rig_pw&miner_ip=$miner_mac"
+  post_data="rig_pw=$rig_pw&miner_ip=$miner_ip"
   [ -n "$miner_id" ] && post_data+="&miner_id=$miner_id"
 
   # Send data to PHP script and get response

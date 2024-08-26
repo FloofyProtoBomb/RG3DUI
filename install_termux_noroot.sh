@@ -152,7 +152,7 @@ if command -v termux-info > /dev/null 2>&1; then
 
 	# Install required packages
 	log "Installing required packages"
-	run_command pkg install -y termux-auth libjansson wget nano git screen openssh libjansson netcat-openbsd jq iproute2 tsu android-tools
+	run_command pkg install -y termux-auth termux-api libjansson wget nano git screen openssh libjansson netcat-openbsd jq iproute2 tsu android-tools
 
 	# Create ~/ccminer folder if not exists
 	log "Creating ~/ccminer folder"

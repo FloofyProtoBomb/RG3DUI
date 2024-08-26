@@ -16,7 +16,7 @@ check_ssl_support() {
 # Function to send data to PHP script or echo if dryrun
 send_data() {
   local url="https://api.rg3d.eu:8443/api.php"
-  local data="hw_brand=$hw_brand&hw_model=$hw_model&ip=$mac&summary=$summary_json&pool=$pool_json&battery=$batt_temp_json&cpu_temp=$cpu_temp_json&cpu_max=$cpu_count&password=$rig_pw&monitor_version=$VERSION&scheduler_version=$scheduler_version"
+  local data="hw_brand=$hw_brand&hw_model=$hw_model&ip=$ip&summary=$summary_json&pool=$pool_json&battery=$batt_temp_json&cpu_temp=$cpu_temp_json&cpu_max=$cpu_count&password=$rig_pw&monitor_version=$VERSION&scheduler_version=$scheduler_version"
 
   if [ -n "$miner_id" ]; then
     data+="&miner_id=$miner_id"
@@ -144,18 +144,19 @@ while true; do
   hw_model=$(echo "$hw_model" | tr '[:lower:]' '[:upper:]')
   measure_time "Hardware model check" $model_start_time
 
-  # 4. Get MAC address
-  mac_start_time=$(date +%s%N)
+  # 4. Get IP address
+  ip_start_time=$(date +%s%N)
   if [ -n "$(uname -o | grep Android)" ]; then
     # For Android
-    mac=$(getprop persist.sys.wifi_mac | sed s/:/./g) 
-    if [ -z "$mac" ]; then
-      # If no MAC address was found, set to null
-      mac="null"
+    ip=$(termux-wifi-connectioninfo | grep -oP '(?<="VpcId": ")[^"]*') 
+    if [ -z "$ip" ]; then
+      # If no IP address was found, set to null
+	  termux-toast -s "Unable to obtain IP Address, setting to 127.0.0.1"
+      ip="127.0.0.1"
     fi
   fi
 
-  measure_time "MAC address retrieval" $mac_start_time
+  measure_time "ip address retrieval" $ip_start_time
 
   # 5. Check if ccminer is running, exit if not
   miner_check_start_time=$(date +%s%N)
