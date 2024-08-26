@@ -20,7 +20,7 @@ debug() {
 get_ip_address() {
   if [ -n "$(uname -o | grep Android)" ]; then
     # For Android
-    ip=$(termux-wifi-connectioninfo | grep -oP '(?<="VpcId": ")[^"]*')
+    ip=$(termux-wifi-connectioninfo | grep -oP '(?<="ip": ")[^"]*')
     if [ -z "$ip" ]; then
       # If no IP address was found, set to null
       termux-toast -s "Unable to obtain IP Address, setting to 127.0.0.1"
