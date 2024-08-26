@@ -192,16 +192,17 @@ while true; do
   for cpuseq in $(seq 1 60); do
     v3=$(cat /sys/devices/virtual/thermal/thermal_zone$cpuseq/type 2>/dev/null)
     v4="soc"
-    if [[ "$v3" == "v4" ]]; then
+    if [[ "$v3" == "$v4" ]]; then
       cpu_temp_raw=$(cat /sys/devices/virtual/thermal/thermal_zone$cpuseq/temp 2>/dev/null)
       cpu_temp=$((cpu_temp_raw / 1000))
+	  toast -s $cpu_temp
       break
     fi
   done
 
-# Format cpu_temp as JSON
-cpu_temp_json="{\"temp\":\"$cpu_temp\"}"
-batt_temp_json="{\"temperature\":\"$batt_temp\"}"
+  # Format cpu_temp as JSON
+  cpu_temp_json="{\"temp\":\"$cpu_temp\"}"
+  batt_temp_json="{\"temperature\":\"$batt_temp\"}"
 
   # Get the scheduler version from the jobscheduler.sh file
   scheduler_version_start_time=$(date +%s%N)
