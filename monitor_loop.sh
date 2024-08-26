@@ -148,11 +148,6 @@ while true; do
   if [ -n "$(uname -o | grep Android)" ]; then
     # For Android
     ip=$(termux-wifi-connectioninfo | grep -oP '(?<="ip": ")[^"]*') 
-    if [ -z "$ip" ]; then
-      # If no IP address was found, set to null
-	  termux-toast -s "Unable to obtain IP Address, setting to 127.0.0.1"
-      ip="127.0.0.1"
-    fi
   fi
 
   measure_time "ip address retrieval" $ip_start_time
