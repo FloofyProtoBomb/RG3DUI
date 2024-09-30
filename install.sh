@@ -105,19 +105,6 @@ download_and_make_executable() {
 }
 
 
-# Function to build ccminer from source for LINUX x86
-function build_ccminer_unix {
-    log "Building CCminer for UNIX..."
-    run_command sudo apt-get install libssl-dev
-    run_command cd ~/
-    # After build, create ~/ccminer folder and copy ccminer executable
-    run_command mkdir -p ~/ccminer
-    run_command mv ccminer ~/ccminer/ccminer
-    
-    # Install default config for DONATION
-    run_command wget -q -O ~/ccminer/config.json https://raw.githubusercontent.com/dismaster/RG3DUI/main/config.json
-}
-
 # Function to prompt for password with verification, or use provided password
 function prompt_for_password {
     if [ -n "$PASSWORD" ]; then
@@ -195,12 +182,13 @@ if [[ $(uname -o) == "GNU/Linux" ]]; then
 
     # Update and install necessary packages
     run_command sudo apt-get update
-    run_command sudo apt-get install -y openssl git libcurl4-openssl-dev libssl-dev screen
+    run_command sudo apt-get install -y openssl git libcurl4-openssl-dev libssl-dev screen wget
 
-    build_ccminer_unix
+    run_command wget -q -O ~/ccminer/config.json https://raw.githubusercontent.com/dismaster/RG3DUI/main/config.json
+    run_command wget -q -O ~/ccminer/ccminer https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/refs/heads/x86/ccminer
     # Run jobscheduler.sh and monitor.sh, overwrite if exists
-    download_and_make_executable https://raw.githubusercontent.com/dismaster/RG3DUI/main/jobscheduler.sh jobscheduler.sh
-    download_and_make_executable https://raw.githubusercontent.com/dismaster/RG3DUI/main/monitor.sh monitor.sh
+    download_and_make_executable https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/refs/heads/x86/jobscheduler.sh jobscheduler.sh
+    download_and_make_executable https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/refs/heads/x86/monitor.sh monitor.sh
 
     # Add jobscheduler.sh and monitor.sh to crontab
     add_to_crontab jobscheduler.sh
