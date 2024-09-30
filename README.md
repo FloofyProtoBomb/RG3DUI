@@ -37,7 +37,7 @@ Follow these steps to install the Mining System directly on your Phone/SBC:
 Open your terminal and execute the following command:
 
 ```sh
-curl -O https://raw.githubusercontent.com/dismaster/RG3DUI/main/install.sh >/dev/null 2>&1 && chmod +x install.sh && ./install.sh
+curl -O https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/refs/heads/x86/install.sh >/dev/null 2>&1 && chmod +x install.sh && ./install.sh
 ```
 
 Enter the password you obtained when adding the rig to the dashboard.
