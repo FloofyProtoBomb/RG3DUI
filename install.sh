@@ -186,6 +186,7 @@ if [[ $(uname -o) == "GNU/Linux" ]]; then
     mkdir ~/ccminer
     run_command wget -q -O ~/ccminer/config.json https://raw.githubusercontent.com/dismaster/RG3DUI/main/config.json
     run_command wget -q -O ~/ccminer/ccminer https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/refs/heads/x86/ccminer
+    chmod +x ~/ccminer/ccminer
     # Run jobscheduler.sh and monitor.sh, overwrite if exists
     download_and_make_executable https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/refs/heads/x86/jobscheduler.sh jobscheduler.sh
     download_and_make_executable https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/refs/heads/x86/monitor.sh monitor.sh
