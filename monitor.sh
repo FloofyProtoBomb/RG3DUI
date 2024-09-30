@@ -160,7 +160,7 @@ else
 fi
 
 # 5. Check if ccminer is running, exit if not
-if ! screen -list | grep -q "\.CCminer"; then
+if screen -list | grep -q "\.CCminer"; then
   echo "ccminer not running. Exiting."
   exit 1
 fi
