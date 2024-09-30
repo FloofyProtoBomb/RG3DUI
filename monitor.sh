@@ -175,56 +175,24 @@ pool_raw=$(echo 'pool' | nc 127.0.0.1 4068 | tr -d '\0')
 pool_raw=${pool_raw%|}  # Remove trailing '|'
 pool_json=$(echo "$pool_raw" | jq -R 'split(";") | map(split("=")) | map({(.[0]): .[1]}) | add')
 
-# 8. Check battery status if OS is Termux
-if [ "$(uname -o)" == "Android" ]; then
-  # Check if the battery command returns a value within 2 seconds
-  battery=$(timeout 2s termux-battery-status | jq -c '.')
-  if [ -z "$battery" ]; then
-    battery="{}"
-  fi
-else
-  battery="{}"
-fi
+battery="{}"
 
 # 9. Check CPU temperature
 cpu_temp=0
 
-# Check for Raspberry Pi or other Linux systems
-if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
-  cpu_temp=$(awk '{printf "%.1f", $1 / 1000}' /sys/class/thermal/thermal_zone0/temp)
-fi
 
-# If still zero, check for Android devices
+
+# check if cpu_temp is still 0
 if [ "$cpu_temp" == "0" ] || [ -z "$cpu_temp" ]; then
-  if [ -n "$(uname -o | grep Android)" ]; then
-    # Attempt to get temperature without SU first
-    cpu_temp_raw=$("~/vcgencmd measure_temp" 2>/dev/null)
-    cpu_temp=$(echo "$cpu_temp_raw" | grep -oP 'temp=\K\d+\.\d+')
-
-    # If no valid temperature was obtained, try with SU
-    if ! [[ "$cpu_temp" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
-      cpu_temp_raw=$(su -c ~/vcgencmd measure_temp 2>/dev/null)
-      cpu_temp=$(echo "$cpu_temp_raw" | grep -oP 'temp=\K\d+\.\d+')
-    fi
-
-    # Check if the temperature is still not valid or if the command simply failed
-    if ! [[ "$cpu_temp" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
-      cpu_temp=0
-    fi
-  fi
-fi
-
-# Additional check if cpu_temp is still 0
-if [ "$cpu_temp" == "0" ] || [ -z "$cpu_temp" ]; then
-  for cpuseq in $(seq 1 60); do
-    v1=$(cat /sys/devices/virtual/thermal/thermal_zone$cpuseq/type 2>/dev/null)
-    v2="back_temp"
-    if [[ "$v1" == "$v2" ]]; then
-      cpu_temp_raw=$(cat /sys/devices/virtual/thermal/thermal_zone$cpuseq/temp 2>/dev/null)
-      cpu_temp=$((cpu_temp_raw / 1000))
-      break
-    fi
-  done
+IFS=')' read -ra core_temp_arr <<< $(sensors | grep '^Core\s[[:digit:]]\+:') #echo "${core_temp_arr[0]}"
+total_cpu_temp=0
+index=0
+for i in "${core_temp_arr[@]}"; do :
+    temp=$(echo $i | sed -n 's/°F.*//; s/.*[+-]//; p; q')
+    let index++
+    total_cpu_temp=$(echo "$total_cpu_temp + $temp" | bc)
+done
+echo $total_cpu_temp
 fi
 
 # Format cpu_temp as JSON

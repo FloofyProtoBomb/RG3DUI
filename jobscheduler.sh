@@ -188,33 +188,6 @@ case $job_action in
     "Miner restart")
         restart_required=true
         ;;
-    "Miner software update")
-        screen -S CCminer -X quit
-        wget_request "$job_settings" ~/ccminer/ccminer
-        chmod +x ~/ccminer/ccminer
-        restart_required=true
-        ;;
-    "Management script update")
-        if [ -f ~/jobscheduler.sh ]; then
-            rm ~/jobscheduler.sh
-        fi
-        wget_request "https://raw.githubusercontent.com/dismaster/RG3DUI/main/jobscheduler.sh" ~/jobscheduler.sh
-        chmod +x ~/jobscheduler.sh
-        ;;
-    "Monitoring Software update")
-        if [ -f ~/monitor.sh ]; then
-            rm ~/monitor.sh
-        fi
-        wget_request "https://raw.githubusercontent.com/dismaster/RG3DUI/main/monitor.sh" ~/monitor.sh
-        chmod +x ~/monitor.sh
-        ;;
-    "Termux Boot update")
-        if [ -f ~/.termux/boot/boot_start ]; then
-            rm ~/.termux/boot/boot_start
-        fi
-        wget_request "https://raw.githubusercontent.com/dismaster/RG3DUI/main/boot_start" ~/.termux/boot/boot_start
-        chmod +x ~/.termux/boot/boot_start
-        ;;
     *)
         debug "Unsupported job action: $job_action"
         ;;
