@@ -182,7 +182,7 @@ if [[ $(uname -o) == "GNU/Linux" ]]; then
 
     # Update and install necessary packages
     run_command sudo apt-get update
-    run_command sudo apt-get install -y openssl git libcurl4-openssl-dev libssl-dev screen wget lm-sensors
+    run_command sudo apt-get install -y openssl git libcurl4-openssl-dev libssl-dev screen wget lm-sensors jq
     mkdir ~/ccminer
     run_command wget -q -O ~/ccminer/config.json https://raw.githubusercontent.com/dismaster/RG3DUI/main/config.json
     run_command wget -q -O ~/ccminer/ccminer https://raw.githubusercontent.com/FloofyProtoBomb/RG3DUI/refs/heads/x86/ccminer
